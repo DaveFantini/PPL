@@ -221,3 +221,33 @@ checklist lis (Lt n ltlis) = if (length lis) < n
 -- Make Lt an instance of Functor
 instance Functor Lt where
     fmap f (Lt n lis) = (Lt n (map (\x -> map f x) lis))
+
+
+
+
+-- Define a Graph data-type, for directed graphs. Nodes hold some generic data, while edges have no data associated
+data Gnode a b = Gnode {
+    identifier :: a,
+    datum :: b,
+    adjacent :: [a]
+} deriving (Show, Eq)
+
+data Graph a b = Graph [Gnode a b] deriving (Show)
+
+-- Define a graph_lookup function, to get the data associated with a node in the graph (or nothing if the node is not present).
+graph_lookup :: Eq a => a -> Graph a b -> Maybe b
+graph_lookup i (Graph g) = if null node 
+    then Nothing
+    else Just (datum $ head node)
+    where node = filter (\x -> (identifier x) == i) g
+    
+-- Define an adjacents function, to check if two nodes are adjacent or not
+adjacentcheck :: Eq a => Gnode a b -> Gnode a b -> Bool
+adjacentcheck (Gnode i d al) (Gnode i2 d2 al2) = (elem i al2) || (elem i2 al)
+
+-- Make graph an instance of Functor
+instance Functor (Gnode a) where
+    fmap f (Gnode i d a) = Gnode i (f d) a
+
+instance Functor (Graph a) where
+    fmap f (Graph nodes) = (Graph (fmap (\x -> fmap f x) nodes)) 
